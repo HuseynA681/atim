@@ -1,4 +1,4 @@
-an import React, { useState } from "react";
+import React, { useState } from "react";
 import { User, Mentor, Course, CourseApplication } from "../types";
 import { 
   UserPlus, Users, CheckCircle, AlertCircle, Shield, Sparkles, Key, 

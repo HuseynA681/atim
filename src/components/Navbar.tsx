@@ -26,11 +26,11 @@ export default function Navbar({
 
   const navItems = [
     { id: "catalog", label: "Kataloq", icon: BookOpen, roles: ["admin", "co-admin", "student", "corporate", "worker", null] },
-    { id: "student-section", label: "Tələbələr", icon: GraduationCap, roles: ["admin", "co-admin", "student"] },
-    { id: "corporate-section", label: "İşçilər", icon: Building, roles: ["admin", "co-admin", "corporate"] },
-    { id: "worker-section", label: "İşçi Paneli", icon: Briefcase, roles: ["admin", "worker"] },
-    { id: "calendar", label: "Təqvim", icon: Calendar, roles: ["admin", "co-admin", "student", "corporate", "worker"] },
-    { id: "chat", label: "Müzakirə", icon: MessageSquare, roles: ["admin", "co-admin", "student", "corporate", "worker"] },
+    { id: "student-section", label: "Tələbələr", icon: GraduationCap, roles: ["admin", "co-admin", "student", "worker"] },
+    { id: "corporate-section", label: "İşçilər", icon: Building, roles: ["admin", "co-admin", "corporate", "worker"] },
+    { id: "worker-section", label: "Görüşlər", icon: Video, roles: ["admin", "worker"] },
+    { id: "calendar", label: "Təqvim", icon: Calendar, roles: ["admin", "co-admin", "student", "worker", "corporate"] },
+    { id: "chat", label: "Müzakirə", icon: MessageSquare, roles: ["admin", "co-admin", "student", "worker", "corporate"] },
     { id: "admin", label: "Admin", icon: Settings, roles: ["admin", "co-admin"] },
   ];
 

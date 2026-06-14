@@ -13,7 +13,7 @@ import Login from "./components/Login";
 
 import { SEEDED_COURSES, SEEDED_MENTORS, CORPORATE_INITIAL_EMPLOYEES, SEEDED_JOBS } from "./data";
 import { Course, Certificate, User, Mentor, CourseApplication } from "./types";
-import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X, Shield } from "lucide-react";
+import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X, Shield, Video, Calendar as CalendarIcon, MessageSquare, Send, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
@@ -405,14 +405,29 @@ export default function App() {
             
             {/* Student Section: Shows Workspace/Exam to students, or User Management summary to Admin */}
             {activeTab === "student-section" && (
-              <div className="space-y-8">
-                {currentUser?.role === "admin" ? (
-                  <div className="p-8 rounded-3xl bg-blue-600/5 border border-blue-500/20">
-                    <h2 className="text-xl font-bold mb-4">Tələbə İdarəetmə</h2>
-                    <p className="text-sm text-slate-400">Siz hal-hazırda admin kimi tələbə bazasına baxırsınız. Ətraflı tənzimləmə üçün Admin Panelinə keçid edin.</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                {currentUser?.role === "admin" || currentUser?.role === "co-admin" || currentUser?.role === "worker" ? (
+                  <div className="p-8 rounded-3xl bg-blue-600/5 border border-blue-500/20 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-bold">Tələbə İdarəetmə</h2>
+                      <button className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+                        <Plus className="w-4 h-4" /> Yeni Tələbə Əlavə Et
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      {users.filter(u => u.role === "student").map(student => (
+                        <div key={student.username} className="p-4 bg-slate-900/50 rounded-2xl flex justify-between items-center border border-slate-800">
+                          <div>
+                            <div className="font-bold">{student.fullName}</div>
+                            <div className="text-xs text-slate-500">@{student.username}</div>
+                          </div>
+                          <button className="text-xs text-blue-400 font-bold hover:underline">Profilə bax / Redaktə et</button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <>
+                ) : currentUser?.role === "student" ? (
+                  <div className="space-y-8">
                     <Workspace
                       courses={courses}
                       onToggleLesson={handleToggleLessonCompleteness}
@@ -425,35 +440,95 @@ export default function App() {
                       onGenerateCertificate={handleGenerateCertificate}
                       darkMode={darkMode}
                     />
-                  </>
+                  </div>
+                ) : (
+                  <div className="text-center py-20 text-slate-500">Bu bölməyə baxmaq üçün tələbə girişi lazımdır.</div>
                 )}
-              </div>
+              </motion.div>
             )}
 
-            {/* Worker Section: Meetings and Corporate tools */}
-            {(activeTab === "corporate-section" || activeTab === "worker-section") && (
-              <div className="space-y-8">
-                {currentUser?.role === "worker" || currentUser?.role === "admin" ? (
-                  <div className="p-8 rounded-3xl bg-emerald-600/5 border border-emerald-500/20">
-                    <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-                      <Video className="w-6 h-6" /> Görüş Platforması
-                    </h2>
-                    <p className="text-xs text-slate-400 mb-6">İşçi olaraq burada onlayn və fiziki görüşlər təyin edə bilərsiniz.</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       <button className="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-left hover:border-blue-500 transition-all">
-                          <span className="font-bold block">Yeni Onlayn Görüş</span>
-                          <span className="text-[10px] text-slate-500 italic">Zoom / Google Meet inteqrasiyası</span>
-                       </button>
-                       <button className="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-left hover:border-blue-500 transition-all">
-                          <span className="font-bold block">Yeni Fiziki Təlim</span>
-                          <span className="text-[10px] text-slate-500 italic">Məkan: ATİM Cənub Korpusu</span>
-                       </button>
-                    </div>
+            {/* Corporate Section */}
+            {activeTab === "corporate-section" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                {(currentUser?.role === "admin" || currentUser?.role === "co-admin") && (
+                  <div className="p-8 rounded-3xl bg-amber-600/5 border border-amber-500/20 mb-8">
+                    <h2 className="text-xl font-bold mb-4">Korporativ Müştəri İdarəetmə</h2>
+                    <p className="text-sm text-slate-400">Şirkət hesablarını və işçi siyahılarını buradan idarə edirsiniz.</p>
                   </div>
-                ) : null}
+                )}
                 <Corporate initialEmployees={CORPORATE_INITIAL_EMPLOYEES} courses={courses} darkMode={darkMode} />
                 <Mentorship mentors={mentors} onUpdateMentors={handleUpdateMentors} darkMode={darkMode} />
-              </div>
+              </motion.div>
+            )}
+
+            {/* Worker Section: Meetings */}
+            {activeTab === "worker-section" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 rounded-3xl bg-emerald-600/5 border border-emerald-500/20">
+                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                  <Video className="w-6 h-6" /> Görüş və Təlim Platforması
+                </h2>
+                <p className="text-xs text-slate-400 mb-6">İşçi olaraq burada həm fiziki, həm də onlayn görüşlər/təlimlər təyin edə bilərsiniz.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                   <button className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-left hover:border-blue-500 transition-all group">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 text-blue-500 group-hover:text-white transition-all">
+                        <Video className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold block">Yeni Onlayn Görüş</span>
+                      <span className="text-[10px] text-slate-500 italic">Zoom / Teams inteqrasiyası</span>
+                   </button>
+                   <button className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-left hover:border-emerald-500 transition-all group">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500 text-emerald-500 group-hover:text-white transition-all">
+                        <Building className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold block">Yeni Fiziki Təlim</span>
+                      <span className="text-[10px] text-slate-500 italic">Məkan: ATİM Cənub Korpusu</span>
+                   </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Calendar Tab */}
+            {activeTab === "calendar" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 rounded-3xl bg-blue-900/10 border border-blue-800/20">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-black flex items-center gap-3"><CalendarIcon className="w-8 h-8 text-blue-500" /> Ümumi Təqvim</h2>
+                  {(currentUser?.role === "admin" || currentUser?.role === "co-admin") && (
+                    <button className="bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">Tədbir Əlavə Et</button>
+                  )}
+                </div>
+                <div className="grid grid-cols-7 gap-2">
+                  {["B.e", "Ç.a", "Ç", "C.a", "C", "Ş", "B"].map(d => <div key={d} className="text-center text-[10px] font-bold text-slate-500 uppercase py-2">{d}</div>)}
+                  {Array.from({ length: 31 }).map((_, i) => (
+                    <div key={i} className="aspect-square bg-slate-900/50 border border-slate-800 rounded-xl p-2 hover:border-blue-500 transition-all cursor-pointer relative">
+                      <span className="text-[10px] font-mono text-slate-500">{i + 1}</span>
+                      {i === 14 && <div className="absolute bottom-2 left-2 right-2 h-1 bg-blue-500 rounded-full"></div>}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Chat Tab */}
+            {activeTab === "chat" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[600px]">
+                <div className="md:col-span-1 bg-slate-900/50 border border-slate-800 rounded-3xl p-4 overflow-y-auto">
+                  <h3 className="text-xs font-bold text-slate-500 uppercase mb-4 px-2">Qruplar</h3>
+                  <div className="space-y-2">
+                    <div className="p-3 bg-blue-600 rounded-2xl text-xs font-bold flex items-center gap-2 cursor-pointer"><Users className="w-4 h-4" /> HSE Təlim Qrupu</div>
+                    <div className="p-3 hover:bg-slate-800 rounded-2xl text-xs font-bold flex items-center gap-2 cursor-pointer"><Users className="w-4 h-4" /> İşçi Heyəti</div>
+                  </div>
+                </div>
+                <div className="md:col-span-3 bg-slate-900/50 border border-slate-800 rounded-3xl flex flex-col overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 font-bold text-sm">HSE Təlim Qrupu</div>
+                  <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                    <div className="max-w-[70%] bg-slate-800 p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed">Salam komanda, növbəti təlim onlayn olacaq.</div>
+                  </div>
+                  <div className="p-4 bg-slate-950/50 flex gap-2">
+                    <input type="text" placeholder="Mesajınızı yazın..." className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500" />
+                    <button className="p-2 bg-blue-600 rounded-xl text-white"><Send className="w-4 h-4" /></button>
+                  </div>
+                </div>
+              </motion.div>
             )}
 
             {activeTab === "admin" && (

@@ -13,11 +13,13 @@ import Login from "./components/Login";
 
 import { SEEDED_COURSES, SEEDED_MENTORS, CORPORATE_INITIAL_EMPLOYEES, SEEDED_JOBS } from "./data";
 import { Course, Certificate, User, Mentor, CourseApplication } from "./types";
-import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X } from "lucide-react";
+import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>("catalog");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return localStorage.getItem("atim_activeTab") || "catalog";
+  });
   const [darkMode, setDarkMode] = useState<boolean>(true);
 
   const [courses, setCourses] = useState<Course[]>(() => {
@@ -37,7 +39,9 @@ export default function App() {
   // Load and manage registered users database
   const [users, setUsers] = useState<User[]>([]);
   const [adminAuthInput, setAdminAuthInput] = useState("");
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem("atim_admin_auth") === "true";
+  });
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Load users from MySQL on mount
@@ -51,7 +55,17 @@ export default function App() {
   }, []);
 
   // Track currently active session
-  const [currentUser, setCurrentUser] = useState<User | null>(null); // Default to null (guest)
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem("atim_loggedInUser");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return null;
+  }); // Load from localStorage on init
 
   // Load and manage mentors database dynamically with persistence
   const [mentors, setMentors] = useState<Mentor[]>(() => {
@@ -95,6 +109,14 @@ export default function App() {
   const [enrollModalCourseId, setEnrollModalCourseId] = useState<string | null>(null);
 
   // Centralized persistence Effects
+  React.useEffect(() => {
+    localStorage.setItem("atim_activeTab", activeTab);
+  }, [activeTab]);
+
+  React.useEffect(() => {
+    localStorage.setItem("atim_admin_auth", String(isAdminAuthenticated));
+  }, [isAdminAuthenticated]);
+
   React.useEffect(() => {
     localStorage.setItem("atim_certificates_db", JSON.stringify(certificates));
   }, [certificates]);

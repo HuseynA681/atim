@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+an import React, { useState } from "react";
 import { User, Mentor, Course, CourseApplication } from "../types";
 import { 
   UserPlus, Users, CheckCircle, AlertCircle, Shield, Sparkles, Key, 
@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 interface AdminPanelProps {
   users: User[];
-  onCreateUser: (username: string, fullName: string, role: "admin" | "student" | "corporate") => boolean;
+  onCreateUser: (username: string, fullName: string, role: User["role"]) => boolean;
   onDeleteUser: (username: string) => boolean;
   onResetPassword: (username: string) => void;
   onSetPassword: (username: string, passwordInput: string) => void;
@@ -81,7 +81,7 @@ export default function AdminPanel({
   // User tab local states
   const [newUsername, setNewUsername] = useState("");
   const [newFullName, setNewFullName] = useState("");
-  const [newRole, setNewRole] = useState<"admin" | "student" | "corporate">("student");
+  const [newRole, setNewRole] = useState<User["role"]>("student");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Manual password modification states
@@ -642,7 +642,11 @@ export default function AdminPanel({
                                   ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                                   : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                             }`}>
-                              {u.role === "admin" ? "Admin" : u.role === "corporate" ? "Partnyor" : "Tələbə"}
+                              {u.role === "admin" ? "Admin" 
+                               : u.role === "co-admin" ? "Co-Admin"
+                               : u.role === "corporate" ? "Partnyor" 
+                               : u.role === "worker" ? "İşçi"
+                               : "Tələbə"}
                             </span>
                           </td>
                           <td className="py-3.5">

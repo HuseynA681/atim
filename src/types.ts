@@ -108,7 +108,7 @@ export interface ChatMessage {
 export interface User {
   username: string; // unique identifier
   fullName: string;
-  role: "admin" | "student" | "corporate";
+  role: "admin" | "co-admin" | "student" | "corporate" | "worker";
   password?: string; // empty initially for admin-created users
   createdAt?: string;
 }
@@ -123,4 +123,3 @@ export interface CourseApplication {
   submittedAt: string;
   status: "Gözləmədə" | "Təsdiqləndi" | "Rədd edilib";
 }
-

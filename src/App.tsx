@@ -535,14 +535,14 @@ export default function App() {
                       <h2 className="text-xl font-bold text-slate-100">Tələbə İdarəetmə</h2>
                       {/* Admin/Co-admin can create users */}
                       {(currentUser?.role === "admin" || currentUser?.role === "co-admin") && (
-                      <button 
-                        onClick={() => setActiveTab("admin")}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center gap-2"
-                      >
-                        <Plus className="w-4 h-4" /> Yeni Tələbə Əlavə Et
-                      </button>
+                        <button 
+                          onClick={() => setActiveTab("admin")}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" /> Yeni Tələbə Əlavə Et
+                        </button>
+                      )}
                     </div>
-                    )}
                     <div className="grid grid-cols-1 gap-2">
                       {users.filter(u => u.role === "student").map(student => (
                         <div key={student.username} className="p-4 bg-slate-900/50 rounded-2xl flex justify-between items-center border border-slate-800">

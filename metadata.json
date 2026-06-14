@@ -1,0 +1,6 @@
+{
+  "name": "ATİM",
+  "description": "ATİM Skills, Training & Certification Ecosystem Platform - Öyrən, Qiymətləndir, Sertifikat Qazan, Karyeranı Qur!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

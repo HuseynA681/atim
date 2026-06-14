@@ -201,24 +201,6 @@ export default function App() {
     setUsers(updated as User[]);
   };
 
-  // Load and manage mentors database dynamically with persistence
-  const [mentors, setMentors] = useState<Mentor[]>(() => {
-    const saved = localStorage.getItem("atim_mentors_db");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return SEEDED_MENTORS;
-  });
-
-  // Centralized persistence for mentors
-  React.useEffect(() => {
-    localStorage.setItem("atim_mentors_db", JSON.stringify(mentors));
-  }, [mentors]);
-
   const handleUpdateMentors = (updatedMentors: Mentor[]) => {
     setMentors(updatedMentors);
   };

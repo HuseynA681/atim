@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
+import mysql from "mysql2/promise";
 
 dotenv.config();
 
@@ -9,6 +10,45 @@ const app = express();
 app.use(express.json());
 
 const PORT = 3000;
+
+// MySQL Connection Pool
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: Number(process.env.MYSQL_PORT) || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// Initialize Database Tables
+async function initDb() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        username VARCHAR(255) PRIMARY KEY,
+        fullName VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL,
+        password VARCHAR(255),
+        createdAt VARCHAR(50)
+      )
+    `);
+    
+    // Seed admin if not exists
+    const [rows]: any = await pool.query("SELECT * FROM users WHERE username = 'admin'");
+    if (rows.length === 0) {
+      await pool.query(
+        "INSERT INTO users (username, fullName, role, password, createdAt) VALUES (?, ?, ?, ?, ?)",
+        ["admin", "Sistem Administratoru", "admin", "admin", new Date().toLocaleDateString("az-AZ")]
+      );
+    }
+    console.log("Database initialized successfully");
+  } catch (err) {
+    console.error("Database initialization failed:", err);
+  }
+}
 
 // Initialize GoogleGenAI client (safe lazy setup)
 let aiClient: GoogleGenerativeAI | null = null;
@@ -33,6 +73,40 @@ function getGenerativeModelWithSystemInstruction(aiClient: GoogleGenerativeAI, s
 // API Routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
+});
+
+// Database Routes for Users
+app.get("/api/users", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM users");
+    res.json(rows);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/users", async (req, res) => {
+  const { username, fullName, role, password, createdAt } = req.body;
+  try {
+    await pool.query(
+      "INSERT INTO users (username, fullName, role, password, createdAt) VALUES (?, ?, ?, ?, ?)",
+      [username, fullName, role, password || null, createdAt]
+    );
+    res.status(201).json({ message: "User created" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/users/:username/password", async (req, res) => {
+  const { username } = req.params;
+  const { password } = req.body;
+  try {
+    await pool.query("UPDATE users SET password = ? WHERE username = ?", [password, username]);
+    res.json({ message: "Password updated" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // AI Chat Route
@@ -329,6 +403,8 @@ Hazırda süni intellekt test rejimindədir. Sizin CV-nin hədəflənən **${tar
 
 // Vite Middleware implementation
 async function startServer() {
+  await initDb();
+
   if (process.env.NODE_ENV !== "production") {
     const { createServer } = await import("vite");
     const vite = await createServer({

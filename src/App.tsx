@@ -35,29 +35,17 @@ export default function App() {
   const [selectedCourseDetail, setSelectedCourseDetail] = useState<Course | null>(null);
 
   // Load and manage registered users database
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem("atim_users_db");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return [
-      {
-        username: "admin",
-        fullName: "Sistem Administratoru",
-        role: "admin",
-        password: "admin"
-      },
-      {
-        username: "hasan",
-        fullName: "Həsən Ağazadə",
-        role: "student"
-      }
-    ];
-  });
+  const [users, setUsers] = useState<User[]>([]);
+
+  // Load users from MySQL on mount
+  React.useEffect(() => {
+    fetch("/api/users")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setUsers(data);
+      })
+      .catch(err => console.error("Failed to fetch users:", err));
+  }, []);
 
   // Track currently active session
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -123,10 +111,6 @@ export default function App() {
   }, [courses]);
 
   React.useEffect(() => {
-    localStorage.setItem("atim_users_db", JSON.stringify(users));
-  }, [users]);
-
-  React.useEffect(() => {
     if (currentUser) {
       localStorage.setItem("atim_loggedInUser", JSON.stringify(currentUser));
     } else {
@@ -158,24 +142,32 @@ export default function App() {
   const handleCreateUser = (username: string, fullName: string, role: "admin" | "student" | "corporate") => {
     const exists = users.some((u) => u.username === username);
     if (exists) return false;
-
+    
+    const createdAt = new Date().toLocaleDateString("az-AZ");
     const newUser: User = {
       username,
       fullName,
       role,
-      createdAt: new Date().toLocaleDateString("az-AZ")
+      createdAt
     };
 
-    const updated = [...users, newUser];
-    setUsers(updated);
+    fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser)
+    }).then(() => setUsers(prev => [...prev, newUser]));
+    
     return true;
   };
 
   const handleUpdatePassword = (username: string, passwordInput: string) => {
-    const updated = users.map((u) => 
-      u.username === username ? { ...u, password: passwordInput } : u
-    );
-    setUsers(updated);
+    fetch(`/api/users/${username}/password`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: passwordInput })
+    }).then(() => {
+      setUsers(prev => prev.map(u => u.username === username ? { ...u, password: passwordInput } : u));
+    });
 
     // Sync active session if this is the active user
     if (currentUser && currentUser.username === username) {

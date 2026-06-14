@@ -13,7 +13,7 @@ import Login from "./components/Login";
 
 import { SEEDED_COURSES, SEEDED_MENTORS, CORPORATE_INITIAL_EMPLOYEES, SEEDED_JOBS } from "./data";
 import { Course, Certificate, User, Mentor, CourseApplication } from "./types";
-import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X, Shield, Video, Calendar as CalendarIcon, MessageSquare, Send, Plus } from "lucide-react";
+import { Star, Clock, Award, BookOpen, AlertCircle, Sparkles, Check, X, Shield, Video, Calendar as CalendarIcon, MessageSquare, Send, Plus, Building } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {

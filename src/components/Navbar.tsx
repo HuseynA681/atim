@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, BookOpen, Briefcase, Award, Users, Building, GraduationCap, Sun, Moon, LogOut, User as UserIcon, Settings, CheckCircle } from "lucide-react";
 import { User } from "../types"; // Assuming types.ts is in the parent directory
+import AtimLogo from "./AtimLogo";
 
 interface NavbarProps {
   activeTab: string;
@@ -47,10 +48,9 @@ export default function Navbar({
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <a href="#" onClick={() => setActiveTab("catalog")} className="flex items-center space-x-2">
-              <img className="h-8 w-auto rounded-full" src="/assets/atim.png" alt="ATIM Logo" />
-              <span className={`text-xl font-extrabold tracking-tight ${darkMode ? "text-white" : "text-slate-900"}`}>ATİM</span>
-            </a>
+            <button onClick={() => setActiveTab("catalog")} className="hover:opacity-80 transition-opacity">
+              <AtimLogo variant="horizontal" darkMode={darkMode} />
+            </button>
           </div>
 
           {/* Desktop Navigation */}
